@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  </head>
+
+
+  <body>
+    <div id="login-page">
+      <h1>REGISTER</h1>
+      <form id="register-form">
+        <label for="username1">Username:</label>
+        <input type="text" id="username1" name="username1" placeholder="Username" required>
+        <button id="register" class="buttons" type="submit">REGISTER</button>
+      </form>
+
+      <h1>LOGIN</h1>
+      <form id="login-form">
+        <label for="username2">Username:</label>
+        <input type="text" id="username2" name="username2" placeholder="Username" required>
+        <button id="login" class="buttons" type="submit">LOGIN</button>
+      </form>
+    </div>
+
+    <div id="home-page" style="display: none;">
+      <h1>Welcome to the Home Page!</h1>
+      <p>You are now logged in.</p>
+    </div>
+
+
+    <script src="client.js" type="module"></script>
+</body>
+</html>
