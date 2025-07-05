@@ -34,7 +34,7 @@ credential_ids = []
 def register_start():
     complex_registration_options = generate_registration_options(
         rp_id="localhost",
-        rp_name="Example Co",
+        rp_name="GM Authentication",
         user_id=bytes([1, 2, 3, 4]),
         user_name="lee",
         user_display_name="Lee",

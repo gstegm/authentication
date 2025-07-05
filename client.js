@@ -4,22 +4,17 @@ const loginForm = document.getElementById('login-form');
 async function registerStart() {
   try {
     const response = await fetch('http://localhost:5000/register/start');
-    
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    
     return (await response.json());  // Parse the response as JSON
-
   } catch (error) {
     console.error('There was a problem with your fetch operation:', error);
   }
 }
 
-
 async function registerFinish(credentials) {
   try {
-    // Make the POST request
     const response = await fetch('http://localhost:5000/register/finish', {
       method: 'POST',
       headers: {
@@ -27,19 +22,12 @@ async function registerFinish(credentials) {
       },
       body: JSON.stringify(credentials)  // Convert the data object into JSON string
     });
-
-    // Check if the response is ok (status code 2xx)
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);
     }
-
-    // Parse the response as JSON
     const responseData = await response.json();
-    
-    // Return the parsed data
     return responseData;
   } catch (error) {
-    // Handle any errors (network errors, JSON errors, etc.)
     console.error('There was a problem with your fetch operation:', error);
     throw error;  // Re-throw if you want to handle it elsewhere
   }
@@ -60,26 +48,20 @@ async function register(event) {
   }
 }
 
-
 async function loginStart() {
   try {
     const response = await fetch('http://localhost:5000/login/start');
-    
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    
     return (await response.json());  // Parse the response as JSON
-
   } catch (error) {
     console.error('There was a problem with your fetch operation:', error);
   }
 }
 
-
 async function loginFinish(credentials) {
   try {
-    // Make the POST request
     const response = await fetch('http://localhost:5000/login/finish', {
       method: 'POST',
       headers: {
@@ -87,24 +69,16 @@ async function loginFinish(credentials) {
       },
       body: JSON.stringify(credentials)  // Convert the data object into JSON string
     });
-
-    // Check if the response is ok (status code 2xx)
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);
     }
-
-    // Parse the response as JSON
     const responseData = await response.json();
-    
-    // Return the parsed data
     return responseData;
   } catch (error) {
-    // Handle any errors (network errors, JSON errors, etc.)
     console.error('There was a problem with your fetch operation:', error);
     throw error;  // Re-throw if you want to handle it elsewhere
   }
 }
-
 
 async function login(event) {
   event.preventDefault();
@@ -138,6 +112,7 @@ function formatRegisterOptions(options) {
 
 function formatRegisterCredentials(credentials) {
   return {
+    // id and rawId given by device
     id: credentials.id,
     rawId: bufferToBase64URLString(credentials.rawId),
     response: {
@@ -169,11 +144,13 @@ function formatLoginCredentials(credentials) {
 
 function formatLoginOptions(options) {
   return {
+    // rpId = domain
     rpId: options.rpId,
     challenge: base64URLStringToBuffer(options.challenge),
     timeout: options.timeout,
     allowCredentials: [{
       type: options.allowCredentials[0].type,
+      // rawId
       id: base64URLStringToBuffer(options.allowCredentials[0].id),
     }],
     userVerification: options.userVerification,
