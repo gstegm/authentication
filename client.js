@@ -51,11 +51,9 @@ async function register(event) {
   if (!username) return alert('Please enter a username');
 
   try {
-    const options = await registerStart();
-    const optionsFormatted = formatOptions(options);
+    const optionsFormatted = formatRegisterOptions(await registerStart());
     const credentials = await navigator.credentials.create({publicKey: optionsFormatted});
-    const credentialsFormatted = formatCredentials(credentials);
-    console.log(credentialsFormatted);
+    const credentialsFormatted = formatRegisterCredentials(credentials);
     registerFinish(credentialsFormatted);
   } catch (err) {
     console.error("Registration error:", err);
@@ -114,51 +112,37 @@ async function login(event) {
   if (!username) return alert('Please enter a username');
 
   try {
-    const options = await loginStart();
-    console.log("options", options);
-    const optionsFormatted = formatLoginOptions(options);
-    console.log("optionsFormatted: ", optionsFormatted);
+    const optionsFormatted = formatLoginOptions(await loginStart());
     const credentials = await navigator.credentials.get({publicKey: optionsFormatted});
     const credentialsFormatted = formatLoginCredentials(credentials);
-    console.log("credentialsFormatted: ", credentialsFormatted);
     loginFinish(credentialsFormatted);
   } catch (err) {
     console.error("Registration error:", err);
   }
 }
 
-function base64urlToUint8Array(base64url) {
-  const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-  const binaryString = atob(base64);
-  const uint8Array = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    uint8Array[i] = binaryString.charCodeAt(i);
-  }
-  return uint8Array;
-}
-
-function formatOptions(options) {
+function formatRegisterOptions(options) {
   return {
     rp: options.rp,
     user: {
-      id: base64urlToUint8Array(options.user.id),
+      id: base64URLStringToBuffer(options.user.id),
       name: options.user.name,
       displayName: options.user.displayName
     },
-    challenge: base64urlToUint8Array(options.challenge),
+    challenge: base64URLStringToBuffer(options.challenge),
     pubKeyCredParams: options.pubKeyCredParams,
     excludeCredentials: options.excludeCredentials,
     attestation: options.attestation,
   }
 }
 
-function formatCredentials(credentials) {
+function formatRegisterCredentials(credentials) {
   return {
     id: credentials.id,
-    rawId: credentials.rawId,
+    rawId: bufferToBase64URLString(credentials.rawId),
     response: {
-      attestationObject: credentials.response.attestationObject,
-      clientDataJSON: credentials.response.clientDataJSON,
+      attestationObject: bufferToBase64URLString(credentials.response.attestationObject),
+      clientDataJSON: bufferToBase64URLString(credentials.response.clientDataJSON),
       transports: credentials.response.transports,
     },
     type: credentials.type,
@@ -167,16 +151,15 @@ function formatCredentials(credentials) {
   }
 }
 
-
 function formatLoginCredentials(credentials) {
   return {
     id: credentials.id,
-    rawId: credentials.rawId,
+    rawId: bufferToBase64URLString(credentials.rawId),
     response: {
-      authenticatorData: credentials.response.authenticatorData,
-      clientDataJSON: credentials.response.clientDataJSON,
-      signature: credentials.response.signature,
-      userHandle: credentials.response.userHandle,
+      authenticatorData: bufferToBase64URLString(credentials.response.authenticatorData),
+      clientDataJSON: bufferToBase64URLString(credentials.response.clientDataJSON),
+      signature: bufferToBase64URLString(credentials.response.signature),
+      userHandle: bufferToBase64URLString(credentials.response.userHandle),
     },
     type: credentials.type,
     authenticatorAttachment: credentials.authenticatorAttachment,
@@ -184,20 +167,41 @@ function formatLoginCredentials(credentials) {
   }
 }
 
-
 function formatLoginOptions(options) {
   return {
     rpId: options.rpId,
-    challenge: base64urlToUint8Array(options.challenge),
+    challenge: base64URLStringToBuffer(options.challenge),
     timeout: options.timeout,
     allowCredentials: [{
       type: options.allowCredentials[0].type,
-      id: base64urlToUint8Array(options.allowCredentials[0].id),
+      id: base64URLStringToBuffer(options.allowCredentials[0].id),
     }],
     userVerification: options.userVerification,
   }
 }
 
+function bufferToBase64URLString(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let str = '';
+    for (const charCode of bytes) {
+        str += String.fromCharCode(charCode);
+    }
+    const base64String = btoa(str);
+    return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function base64URLStringToBuffer(base64URLString) {
+    const base64 = base64URLString.replace(/-/g, '+').replace(/_/g, '/');
+    const padLength = (4 - (base64.length % 4)) % 4;
+    const padded = base64.padEnd(base64.length + padLength, '=');
+    const binary = atob(padded);
+    const buffer = new ArrayBuffer(binary.length);
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+}
 
 registerForm.addEventListener('submit', register);
 loginForm.addEventListener('submit', login);
