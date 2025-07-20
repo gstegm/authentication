@@ -1,9 +1,15 @@
 const registerForm = document.getElementById('register-form');
 const loginForm = document.getElementById('login-form');
 
-async function registerStart() {
+async function registerStart(username) {
   try {
-    const response = await fetch('http://localhost:5000/register/start');
+    const response = await fetch('http://localhost:5000/register/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',  // Indicate that we are sending JSON
+      },
+      body: JSON.stringify({username})  // Convert the data object into JSON string
+    });
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -13,14 +19,14 @@ async function registerStart() {
   }
 }
 
-async function registerFinish(credentials) {
+async function registerFinish(username, credentials) {
   try {
     const response = await fetch('http://localhost:5000/register/finish', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',  // Indicate that we are sending JSON
       },
-      body: JSON.stringify(credentials)  // Convert the data object into JSON string
+      body: JSON.stringify({username, credentials})  // Convert the data object into JSON string
     });
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -39,7 +45,7 @@ async function register(event) {
   if (!username) return alert('Please enter a username');
 
   try {
-    const optionsFormatted = formatRegisterOptions(await registerStart());
+    const optionsFormatted = formatRegisterOptions(await registerStart(username));
     const credentials = await navigator.credentials.create({publicKey: optionsFormatted});
     const credentialsFormatted = formatRegisterCredentials(credentials);
     registerFinish(credentialsFormatted);
@@ -48,9 +54,15 @@ async function register(event) {
   }
 }
 
-async function loginStart() {
+async function loginStart(username) {
   try {
-    const response = await fetch('http://localhost:5000/login/start');
+    const response = await fetch('http://localhost:5000/login/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',  // Indicate that we are sending JSON
+      },
+      body: JSON.stringify({username})  // Convert the data object into JSON string
+    });
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -60,14 +72,14 @@ async function loginStart() {
   }
 }
 
-async function loginFinish(credentials) {
+async function loginFinish(username, credentials) {
   try {
     const response = await fetch('http://localhost:5000/login/finish', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',  // Indicate that we are sending JSON
       },
-      body: JSON.stringify(credentials)  // Convert the data object into JSON string
+      body: JSON.stringify({username, credentials})  // Convert the data object into JSON string
     });
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);
